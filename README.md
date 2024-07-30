@@ -1,4 +1,4 @@
-<h1>Abhishek Shelar - Portfolio Website</h1>
+<h1>Abhishek Shelar - Automated Notices Generation And Emailing System</h1>
 <br>
 <h3>-Overview</h3>
 <ul>
@@ -12,6 +12,7 @@
   <li>HTML </li>
   <li>CSS</li>
   <li>JavaScript</li>
+  <li>Node Js</li>
 </ul>
 
 <h3>-Resources used</h3>
@@ -19,7 +20,7 @@
   <li>I just inspected all the websites I visited and learned through that</li>
   <li>Few Youtube tutorials for JavaScript</li>
   <li>W3schools to practice</li>
-  <li>More Youtube videos and Google for color palette</li>
+ 
 </ul>
 
 <h3>-What I Learned by doing this</h3>
