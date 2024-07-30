@@ -12,7 +12,7 @@ const newHisaab=require('./models/hisaab.js')
 
 
 
-const conn=mongoose.connect("mongodb://localhost:27017/user_hisaabDetails")
+const conn=mongoose.connect("mongodb+srv://abhishekshelar1262003:1557Abhi@abhishek.i4cx7te.mongodb.net/?retryWrites=true&w=majority&appName=Abhishek")
 
 app.set('view engine','ejs')
 app.use(express.static(path.join(__dirname,'public')))
