@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Hisaab</title>
+    <link href="src/output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="w-screen h-screen">
+        <nav class="w-full h-[10%] flex items-center justify-between pl-5">
+            <span class="font-medium text-2xl">Khaatabook</span>
+            <div class="h-full flex items-center gap-16 font-semibold w-[400px]">
+                <a href="/"><span class="">Home</span></a>
+                <a href="/createHisaab" class="cursor-pointer border-blue-700 border-b-4 rounded-b-md"><span>Create New Hisaab</span></a>
+                <a href="/logOut" class="cursor-pointer bg-blue-600 p-2 hover:p-2.5 text-white rounded-md text-xs">Log Out</a>
+            </div>
+        </nav>
+
+        <div class="h-5/6 pl-5">
+            <h1 class="text-lg">Create New Hisaab</h1>
+            <form action="/addHisaab" method="POST" class=" flex mt-2 flex-col h-5/6 w-1/2 gap-2">
+                    <input type="text" class="bg-gray-100 rounded-md w-64 px-2 py-1 border-none outline-none" placeholder="Enter the name of file" name="filename">
+                    <textarea name="hisaab" placeholder="aata,idli,dosa" id="hisaab" class="bg-gray-100 rounded-md border-none outline-gray-300 h-1/2 p-2"></textarea>
+                    <div class=" mt-5 h-28">
+                        <div class="flex gap-20">
+                            <div class=" h-16 flex flex-col gap-3 justify-between">
+                                <div class="flex gap-2 items-center">
+                                    <input type="checkbox" name="encrypt" id="checkbox"> 
+                                    <span>Encrypt this file</span>
+                                </div>
+                                <input class="rounded-md border-none outline-none bg-gray-200 text-sm px-5 py-3 border-black w-32" placeholder="Passcode" id="password" type="password" name="password" disabled>
+
+                            </div>
+                            
+
+                            <div class=" h-16 flex flex-col justify-between">
+                                <div>
+                                    <input type="checkbox" name="shareable">
+                                    <span>Shareable file ?</span>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="isEdit">
+                                    <span>Edit Permissions</span>
+                                </div>
+
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                    <button type="submit" value="submit" class="w-36 bg-blue-600  text-white outline-none border-none py-2 mt-5 rounded-md">Create Hisaab</button>
+            </form>
+        </div>
+       
+    </div>
+
+
+    <script>
+        let checkbox=document.getElementById('checkbox')
+        
+        checkbox.addEventListener('click',()=>{
+            if(checkbox.checked)
+            {
+                password.disabled=!password.disabled
+                password.focus()
+            }
+            else
+            {
+                password.disabled=true
+            }
+            
+        })
+    </script>
+</body>
+</html>

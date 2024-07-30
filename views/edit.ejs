@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Hisaab</title>
+    <link href="src/output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="w-screen h-screen p-5">
+
+        <h1 class="text-lg">Edit <span class="text-blue-700 underline"><%= firstName%></span> Hisaab</h1>
+        <form action="/editHisaab/<%= fileName%>" method="POST" class=" flex mt-2 flex-col h-5/6 w-1/2">
+             <textarea name="hisaab"  placeholder="aata,idli,dosa" id="hisaab" class="bg-gray-100 rounded-md border-none outline-gray-300 h-1/2 p-2"><%= data%></textarea>
+             <button type="submit" value="submit" class="w-36 bg-blue-600  text-white outline-none border-none py-2 mt-5 rounded-md">Edit Hisaab</button>
+        </form>
+     </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="src/output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="w-screen h-screen">
+        <nav class="w-full h-[10%] flex items-center justify-between pl-5">
+            <span class="font-medium text-2xl">Khaatabook</span>
+            <div class="h-full flex items-center gap-16 font-semibold w-[400px]">
+                <a href="/"><span class=" rounded-b-md">Home</span></a>
+                <a href="/createHisaab" class="cursor-pointer"><span>Create New Hisaab</span></a>
+                <a href="/logOut" class="cursor-pointer bg-blue-600 p-2 hover:p-2.5 text-white rounded-md text-xs">Log Out</a>
+            </div>
+        </nav>
+
+
+        <div class="w-screen h-[90%] flex justify-center items-center">
+            <div class="mb-36 w-[400px]">
+                <h1 class="text-2xl font-medium mb-2">Login Your Account</h1>
+                <form action="/login" method="post" class="flex flex-col gap-5">
+                    <input type="email" name="email" placeholder="Email" class="p-3 <%= err.length ? 'border border-red-600' : '' %> rounded-md bg-gray-100 outline-none">
+                    <input type="password" name="password" placeholder="password" class="p-3 <%= err.length ? 'border border-red-600' : '' %>  rounded-md bg-gray-100 outline-none">
+                    <div class="flex items-center gap-10">
+                        <button type="submit" class="p-2 w-1/4 rounded-md bg-blue-600 text-white ">Login</button>
+                        <a href="/register"><span class="text-blue-400 cursor-pointer font-semibold">Create your account -></span></a>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
