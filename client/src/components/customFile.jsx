@@ -23,7 +23,7 @@ function CustomFile(){
                 />
             </div>
             
-            <div className='border border-black h-full w-1/2 p-1' dangerouslySetInnerHTML={{ __html: fileData }}>
+            <div className='h-full w-1/2 p-1 overflow-scroll' dangerouslySetInnerHTML={{ __html: fileData }}>
             </div>
         </div>
             
