@@ -1,0 +1,12 @@
+.class {
+    overflow-y: scroll; /* Allows scroll functionality */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    
+  }
+  
+  /* Hide scrollbar for WebKit-based browsers */
+  .class::-webkit-scrollbar {
+    display: none;
+  }
+  
