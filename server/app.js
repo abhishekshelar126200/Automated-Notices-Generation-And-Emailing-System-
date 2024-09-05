@@ -51,9 +51,17 @@ app.get('/api/data/fourth', (req, res) => {
 // Add Record in database
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: async function (req, file, cb) {
     const uploadPath = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`);
-    cb(null, uploadPath); 
+    
+    // Check if the path exists, if not create it
+    try {
+      await fs.mkdir(uploadPath, { recursive: true }); // Creates the folder if it doesn't exist
+      cb(null, uploadPath);
+    } catch (err) {
+      console.error('Error creating directory:', err);
+      cb(err); // Pass the error to multer if directory creation fails
+    }
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname); // or generate a unique name if needed
@@ -65,74 +73,75 @@ const upload = multer({ storage: storage }).fields([
   { name: 'excelFile', maxCount: 1 }
 ]);
 
+// Add Record in database
+app.post('/api/data/addRecord', upload, async (req, res) => {
+  if (req.method === 'POST') {
+    const { academicYear, year, branch } = req.body;
+    const result = await record.find({ academicYear: academicYear, year: year, branch: branch });
 
-app.post('/api/data/addRecord',upload,async (req,res)=>{
-      if(req.method=='POST')
-      {
-        const { academicYear,year,branch}=req.body;
-        const result=await record.find({academicYear:academicYear,year:year,branch:branch});
-        if(result.length==0)
-        {
-          const uniqueId = uuidv4();
+    if (result.length === 0) {
+      const uniqueId = uuidv4();
 
-          const wordFile = req.files['wordFile'] ? req.files['wordFile'][0].filename : null;
-          const excelFile = req.files['excelFile'] ? req.files['excelFile'][0].filename : null;
-  
-          await record.create({
-            id:uniqueId,
-            academicYear,
-            year,
-            branch,
-            wordFile,
-            excelFile
-          });
-          const filepath_excel=path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`,`${excelFile}`);
-          const workbook = xlsx.readFile(filepath_excel);
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const recipients = xlsx.utils.sheet_to_json(worksheet);
-          const filepath_word=path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`,`${wordFile}`);
-          await fs.mkdir(path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'Notices', `${req.body.branch}`,`${uniqueId}`))
-          const filepath_notice=path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'Notices', `${req.body.branch}`,`${uniqueId}`);
-          
-          recipients.forEach(async (recipient) => {
-          try 
-            {
-                const content = await fs.readFile(path.join(filepath_word), 'binary');
-                const zip = new PizZip(content);
-                const doc = new Docxtemplater(zip, {
-                  paragraphLoop: true,
-                  linebreaks: true,
-                });
-                doc.setData({
-                  student_name: recipient.Name,
-                  student_id: recipient.roll_no,
-                  branch: recipient.branch,
-                  year: recipient.year,
-                  pending_fees: recipient.pendingfees
-                });
-        
-                try {
-                  doc.render();
-                } catch (error) {
-                    console.error('Error rendering document:', error);
-                }
-        
-                const buffer = doc.getZip().generate({ type: 'nodebuffer' });
-                await fs.writeFile(path.join(filepath_notice,`${recipient.roll_no}.docx`), buffer);
-          } 
-          catch (error) 
-          {
-              console.error('Error while storing file:', error);
-          }
-        })
-        
-        }
+      const wordFile = req.files['wordFile'] ? req.files['wordFile'][0].filename : null;
+      const excelFile = req.files['excelFile'] ? req.files['excelFile'][0].filename : null;
 
-      }
+      await record.create({
+        id: uniqueId,
+        academicYear,
+        year,
+        branch,
+        wordFile,
+        excelFile
+      });
 
+      const filepath_excel = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`, `${excelFile}`);
+      const workbook = xlsx.readFile(filepath_excel);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const recipients = xlsx.utils.sheet_to_json(worksheet);
       
-  res.redirect("/displayRecords")
+      const filepath_word = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`, `${wordFile}`);
+      
+      const noticeDir = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'Notices', `${req.body.branch}`, `${uniqueId}`);
+      
+      try {
+        await fs.mkdir(noticeDir, { recursive: true }); // Ensure the notice directory exists
+        recipients.forEach(async (recipient) => {
+          try {
+            const content = await fs.readFile(path.join(filepath_word), 'binary');
+            const zip = new PizZip(content);
+            const doc = new Docxtemplater(zip, {
+              paragraphLoop: true,
+              linebreaks: true,
+            });
+
+            doc.setData({
+              student_name: recipient.Name,
+              student_id: recipient.roll_no,
+              branch: recipient.branch,
+              year: recipient.year,
+              pending_fees: recipient.pendingfees
+            });
+
+            try {
+              doc.render();
+            } catch (error) {
+              console.error('Error rendering document:', error);
+            }
+
+            const buffer = doc.getZip().generate({ type: 'nodebuffer' });
+            await fs.writeFile(path.join(noticeDir, `${recipient.roll_no}.docx`), buffer);
+          } catch (error) {
+            console.error('Error while storing file:', error);
+          }
+        });
+      } catch (err) {
+        console.error('Error creating notice directory:', err);
+      }
+    }
+  }
+
+  res.redirect("/displayRecords");
 });
 
 // Return records from database
