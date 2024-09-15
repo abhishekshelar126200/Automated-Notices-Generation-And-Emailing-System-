@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api/data': 'http://localhost:5000/',
+      '/api/data': 'https://automated-notices-generation-and-yi1q.onrender.com',
     },
   },
 });
