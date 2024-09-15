@@ -1,31 +1,15 @@
 import React,{useState} from 'react';
 import MonacoEditor from '@monaco-editor/react';
+import {Link} from 'react-router-dom'
 
 function CustomFile(){
-    const [fileData,setfileData]=useState(localStorage.getItem('fileData') || 'Customize the content of file');
-    const setFileData=(value)=>{
-        setfileData(value);
-        localStorage.setItem('fileData',value);
-    }
+    
     return(
         <>
-        <div className='flex justify-start h-full w-full'>   
-            <div className='w-1/2 h-full p-1'>
-                <MonacoEditor
-                    defaultLanguage="html"
-                    value={fileData}
-                    onChange={(value) => setFileData(value)}
-                    options={{
-                    automaticLayout: true,
-                    wordWrap: "on",
-                    minimap: { enabled: false },
-                    }}
-                />
+            <div className='border flex'>   
+                <Link to='/customWordFileHtml' className='border-b-2 border-blue-500 w-1/2 text-center'>HTML</Link>
+                <Link to='/customWordFileEditor' className='w-1/2 text-center'>Editor</Link>
             </div>
-            
-            <div className='h-full w-1/2 p-1 overflow-scroll' dangerouslySetInnerHTML={{ __html: fileData }}>
-            </div>
-        </div>
             
         </>
     );

@@ -40,6 +40,20 @@ function First() {
     localStorage.setItem('branch',event.target.value)
   }
 
+  const handleDeleteFile = async (fileName, academicYear, year, branch) => {
+    try {
+      // Make the API call to delete the file
+      const response=await fetchData(`deleteFile/${academicYear}/${year}/${branch}/${fileName}`);
+      await fetchData(`retreiveFiles/${academicYear}/${year}/${branch}`).then((data) => setData(data));
+      // Update the file list by fetching the updated list
+
+      alert(response.status);
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      alert('Failed to delete file');
+    }
+  };
+
   useEffect(()=>{
       if(academicYear==='2021-22')
       {
@@ -100,10 +114,13 @@ function First() {
           <div className='h-[80%] flex flex-col gap-5 overflow-scroll'>
             {Object.keys(filesData).map((keyYear,yearIndex)=>(
               Object.keys(filesData[keyYear]).map((keyBranch,branchIndex)=>(
+
                     keyYear === "BE" ? (
                       <div id="BE" className='h-full relative'>
                           <h1 className='h-[15%] p-1 border bg-gray-100'>BE-{keyBranch}</h1>
+
                           {filesData[keyYear] && filesData[keyYear][keyBranch] && filesData[keyYear][keyBranch].length > 0 ? (
+                            
                             <div className='class h-[85%] p-2 flex flex-wrap gap-5 justify-between border overflow-scroll'>
                               {filesData[keyYear][keyBranch].map((file, fileIndex) => (
                                 
@@ -117,16 +134,14 @@ function First() {
                                         <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
                                             <img src={`${pen}`} className='w-4' alt="" />
                                         </Link>
-                                        <form action={`/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
-                                            <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
-                                        </form>
+                                        
+                                        <button type='submit' onClick={()=>(handleDeleteFile(file,academicYear,keyYear,keyBranch))}><img src={`${remove}`} className='w-4' alt="" /></button>
+                                        
                                     </div>
                                   </div>
                                 
                               ))}
-                               <div className='absolute bottom-0 p-1 px-3 rounded-md bg-red-600 text-white'>
-                                <a href={`/sendMail/${academicYear}/${keyYear}/${keyBranch}`}>Send Mail</a>
-                              </div>
+                              
                             </div>
                           ) : (
                             <div className='h-[85%] p-2'>
@@ -136,7 +151,11 @@ function First() {
                             </div>
                           )}
                       </div>
-                    ) : keyYear === "TE" ? (
+                    ) 
+
+                    : 
+                    
+                    keyYear === "TE" ? (
                       <div id="TE" className='h-full relative'>
                           <h1 className='h-[15%] p-1 border bg-gray-100'>TE-{keyBranch}</h1>
                           {filesData[keyYear] && filesData[keyYear][keyBranch] && filesData[keyYear][keyBranch].length > 0 ? (
@@ -152,15 +171,13 @@ function First() {
                                     <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
                                         <img src={`${pen}`} className='w-4' alt="" />
                                     </Link>
-                                    <form action={`/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
+                                    <form action={`/api/data/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
                                         <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
                                     </form>
                                 </div>
                               </div>
                               ))}
-                              <div className='absolute bottom-0 p-1 px-3 rounded-md bg-red-600 text-white'>
-                                <a href={`/sendMail/${academicYear}/${keyYear}/${keyBranch}`}>Send Mail</a>
-                              </div>
+                              
                             </div>
                           ) : (
                             <div className='h-[85%] p-2'>
@@ -170,7 +187,11 @@ function First() {
                             </div>
                           )}
                       </div>
-                    ) : keyYear === "SE" ? (
+                    )
+                    
+                    : 
+                    
+                    keyYear === "SE" ? (
                       <div id="SE" className='min-h-full relative'>
                           <h1 className='min-h-[15%] p-1 border bg-gray-100'>SE-{keyBranch}</h1>
                           {filesData[keyYear] && filesData[keyYear][keyBranch] && filesData[keyYear][keyBranch].length > 0 ? (
@@ -186,15 +207,13 @@ function First() {
                                     <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
                                         <img src={`${pen}`} className='w-4' alt="" />
                                     </Link>
-                                    <form action={`/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
+                                    <form action={`/api/data/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
                                         <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
                                     </form>
                                 </div>
                               </div>
                               ))}
-                              <div className='absolute bottom-0 p-1 px-3 rounded-md bg-red-600 text-white'>
-                                <a href={`/sendMail/${academicYear}/${keyYear}/${keyBranch}`}>Send Mail</a>
-                              </div>
+                             
                             </div>
                             
                           ) : (
@@ -205,7 +224,11 @@ function First() {
                             </div>
                           )}
                       </div>
-                    ) : keyYear === "FE" ? (
+                    ) 
+                    
+                    : 
+                    
+                    keyYear === "FE" ? (
                       <div id="FE" className='h-full relative'>
                           <h1 className='h-[15%] p-1 border bg-gray-100'>FE-{keyBranch}</h1>
                           {filesData[keyYear] && filesData[keyYear][keyBranch] && filesData[keyYear][keyBranch].length > 0 ? (
@@ -221,15 +244,13 @@ function First() {
                                     <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
                                         <img src={`${pen}`} className='w-4' alt="" />
                                     </Link>
-                                    <form action={`/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
+                                    <form action={`/api/data/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
                                         <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
                                     </form>
                                 </div>
-                              </div>
+                              </div>    
                               ))}
-                              <div className='absolute bottom-0 p-1 px-3 rounded-md bg-red-600 text-white'>
-                                <a href={`/sendMail/${academicYear}/${keyYear}/${keyBranch}`}>Send Mail</a>
-                              </div>
+                              
                             </div>
                           ) : (
                             <div className='h-[85%] p-2'>
@@ -239,7 +260,11 @@ function First() {
                             </div>
                           )}
                       </div>
-                    ) : (
+                    ) 
+                    
+                    : 
+                    
+                    (
                       <div className='h-[85%] p-2'>
                                 <div className='p-1 w-[20%] h-[50px] text-xs'>
                                   Record Not Found

@@ -16,15 +16,22 @@ const docx = require('docx');
 const { Document, Packer, Paragraph, TextRun } = docx;
 const nodemailer = require("nodemailer");
 const { readdir } = require('fs');
-
+const pdf = require('html-pdf');
+const htmlToDocx = require('html-to-docx');
+const cors=require('cors');
 
 
 const app = express();
 
+app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
 
-
+const generateUniqueId = (req, res, next) => {
+  req.uniqueId = uuidv4();
+  next();
+};
 
 const conn=mongoose.connect("mongodb+srv://abhishekshelar1262003:1557Abhi@abhishek.i4cx7te.mongodb.net/?retryWrites=true&w=majority&appName=Abhishek")
 
@@ -52,7 +59,7 @@ app.get('/api/data/fourth', (req, res) => {
 
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
-    const uploadPath = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`);
+    const uploadPath = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`,`${req.uniqueId}`);
     
     // Check if the path exists, if not create it
     try {
@@ -74,13 +81,13 @@ const upload = multer({ storage: storage }).fields([
 ]);
 
 // Add Record in database
-app.post('/api/data/addRecord', upload, async (req, res) => {
+app.post('/api/data/addRecord',generateUniqueId, upload, async (req, res) => {
   if (req.method === 'POST') {
     const { academicYear, year, branch } = req.body;
     const result = await record.find({ academicYear: academicYear, year: year, branch: branch });
 
     if (result.length === 0) {
-      const uniqueId = uuidv4();
+      const uniqueId = req.uniqueId;
 
       const wordFile = req.files['wordFile'] ? req.files['wordFile'][0].filename : null;
       const excelFile = req.files['excelFile'] ? req.files['excelFile'][0].filename : null;
@@ -94,13 +101,13 @@ app.post('/api/data/addRecord', upload, async (req, res) => {
         excelFile
       });
 
-      const filepath_excel = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`, `${excelFile}`);
+      const filepath_excel = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`,`${uniqueId}`,`${excelFile}`);
       const workbook = xlsx.readFile(filepath_excel);
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const recipients = xlsx.utils.sheet_to_json(worksheet);
       
-      const filepath_word = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`, `${wordFile}`);
+      const filepath_word = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'uploads', `${req.body.branch}`,`${uniqueId}`, `${wordFile}`);
       
       const noticeDir = path.join(__dirname, 'public', 'student_data', `${req.body.academicYear}`, `${req.body.year}`, 'Notices', `${req.body.branch}`, `${uniqueId}`);
       
@@ -229,11 +236,85 @@ app.get('/api/data/retreiveFiles/:academicYear/:year/:branch',async (req,res)=>{
   {
     records=await record.find({academicYear:academicYear,year:year,branch:branch});
   }
-
   if(records.length>0)
   {
     const fetchedFiles=await retreiveFiles(records);
     res.send(fetchedFiles);
+  }
+  else
+  {
+    res.json({'error':["Record Not found"]});
+  }
+});
+
+//retreiveMail
+
+const retreiveMails=async (records)=>{
+  try {
+    let emails=[];
+    // let finalResults={};
+    for(let record of records)
+    {
+      const files= await fs.readdir(path.join(__dirname, 'public', 'student_data',`${record.academicYear}`,`${record.year}`,'Notices',`${record.branch}`,`${record.id}`));
+      const excelPath = path.join(__dirname, 'public', 'student_data', record.academicYear, record.year, 'uploads', record.branch , record.id, 'Student.xlsx');
+      const workbook = xlsx.readFile(excelPath);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data = xlsx.utils.sheet_to_json(worksheet); 
+      files.map(file=>{
+        const fileNameWithoutExt = path.basename(file, path.extname(file));
+        const fileResults = data.filter(row => {
+          // Convert roll_no to string if it's not already
+          const rollNo = String(row.roll_no);
+
+          // Check if rollNo includes the fileNameWithoutExt
+          return rollNo && rollNo.includes(fileNameWithoutExt);
+        });
+        emails.push({
+          id:record.id,
+          name:fileResults[0].Name,
+          rollNo:fileResults[0].roll_no,
+          academicYear:record.academicYear,
+          branch:fileResults[0].branch,
+          year:fileResults[0].year,
+          email:fileResults[0].email_address
+        });
+        
+      })
+
+    }
+    
+    
+    return emails;
+  } catch (err) {
+    console.error('Error reading files:', err);
+    throw err;  
+  }
+}
+
+app.get('/api/data/retreiveMail/:academicYear/:year/:branch',async (req,res)=>{
+  const {academicYear,year,branch}=req.params;
+  let records=[];
+  if(year==='noYear' && branch==='noBranch')
+  {
+    records=await record.find({academicYear:academicYear});
+  }
+  else if(year==='noYear')
+  {
+    records=await record.find({academicYear:academicYear,branch:branch});
+  }
+  else if(branch==='noBranch')
+  {
+    records=await record.find({academicYear:academicYear,year:year});
+  }
+  else
+  {
+    records=await record.find({academicYear:academicYear,year:year,branch:branch});
+  }
+  if(records.length>0)
+  {
+    const emails=await retreiveMails(records);
+    res.send(emails);
   }
   else
   {
@@ -263,12 +344,11 @@ app.get('/api/data/:academicYear/:year/:branch/:fileName',async (req, res) => {
 
 //Save edited file
 
-app.post('/saveContent/:academicYear/:year/:branch/:fileName',async (req,res)=>{
+app.post('/api/data/saveContent/:academicYear/:year/:branch/:fileName',async (req,res)=>{
     const {academicYear,year,branch,fileName}=req.params;
     const foundRecord=await record.findOne({academicYear:academicYear,year:year,branch:branch});
     const content=req.body.content;
     const filePath= path.join(__dirname, 'public', 'student_data', academicYear, year, 'Notices', branch,`${foundRecord.id}`, fileName);
-
     try {
       const plainText = htmlToText(content, {
       wordwrap: 130,
@@ -302,32 +382,28 @@ app.post('/saveContent/:academicYear/:year/:branch/:fileName',async (req,res)=>{
 });
 
 //Delete File
-app.get('/deleteFile/:academicYear/:year/:branch/:fileName',async (req,res)=>{
-  const {academicYear,year,branch,fileName}=req.params;
-  const foundRecord=await record.findOne({academicYear:academicYear,year:year,branch:branch});
-  const filePath= path.join(__dirname, 'public', 'student_data', academicYear, year, 'Notices', branch,foundRecord.id, fileName);  
-  await fs.unlink(filePath);
-  res.redirect('/');
+app.get('/api/data/deleteFile/:academicYear/:year/:branch/:fileName',async (req,res)=>{
+  try {
+    const { academicYear, year, branch, fileName } = req.params;
+    const foundRecord = await record.findOne({ academicYear, year, branch });
+    if (!foundRecord) {
+      return res.status(404).send('Record not found');
+    }
+    const filePath = path.join(__dirname, 'public', 'student_data', academicYear, year, 'Notices', branch, foundRecord.id, fileName);
+    
+    await fs.unlink(filePath);
+    res.status(200).json({status:"Delete Succesfully"});
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error deleting file');
+  }
 });
 
 //Send Mail
 
-app.get('/sendMail/:academicYear/:year/:branch',async (req,res)=>{
-  const { academicYear, year, branch } = req.params;
-
+app.post('/api/data/sendMail',async (req,res)=>{
+  const { subject,body,emails } = req.body;
   try {
-      const foundRecord = await record.findOne({ academicYear, year, branch });
-      const filePath = path.join(__dirname, 'public', 'student_data', academicYear, year, 'Notices', branch, foundRecord.id);
-      const excelPath = path.join(__dirname, 'public', 'student_data', academicYear, year, 'uploads', branch, 'Student.xlsx');
-
-      const workbook = xlsx.readFile(excelPath);
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const data = xlsx.utils.sheet_to_json(worksheet);
-
-      const files = await fs.readdir(filePath);
-
-      // Create a mail transport
       const auth = nodemailer.createTransport({
           service: "gmail",
           secure: true,
@@ -337,49 +413,63 @@ app.get('/sendMail/:academicYear/:year/:branch',async (req,res)=>{
               pass: "ttbr htww rimk fmrl"
           }
       });
+      emails.map(async item=>{
+        const filePath = path.join(__dirname, 'public', 'student_data', item.academicYear, item.year, 'Notices', item.branch, item.id);
+        const receiver = {
+          from : "abhishekshelar1262003@gmail.com",
+          to : item.email,
+          subject : subject,
+          text : body,
+          html: `<i>${body}</i>`,
+          attachments: [
+            {
+                filename: `${item.name}.docx`,
+                path: path.join(filePath,`${item.rollNo}.docx`)
+            }
+          ]
+        };
+        let info = await auth.sendMail(receiver,(error,emailResponse)=>{
+            if(error)
+              console.log(error);
+        });
+      })
 
-      // Process each file
-      const results = [];
-      for (const file of files) {
-          try {
-              const fileNameWithoutExt = path.basename(file, path.extname(file));
-              const fileResults = data.filter(row => {
-                // Convert roll_no to string if it's not already
-                const rollNo = String(row.roll_no);
-
-                // Check if rollNo includes the fileNameWithoutExt
-                return rollNo && rollNo.includes(fileNameWithoutExt);
-              });
-              if (fileResults.length > 0) {
-                    const receiver = {
-                      from : "abhishekshelar1262003@gmail.com",
-                      to : fileResults[0].email_address,
-                      subject : "Node Js Mail Testing!",
-                      text : "Hello this is a text mail!",
-                      html: "<i>Hello World</i>",
-                      attachments: [
-                        {
-                            filename: `${fileResults[0].Name}.docx`,
-                            path: path.join(filePath,`${fileResults[0].roll_no}.docx`)
-                        }
-                      ]
-                    };
-                    let info = await auth.sendMail(receiver,(error,emailResponse)=>{
-                        if(error)
-                          console.log("Error")
-                          // res.send("error is occur!");
-                    });
-              }
-          } catch (error) {
-              console.error("Error processing file:", file, error);
-          }
-      }
-
-      // Send the results as a response
-      res.send("Mail sent successfully");
   } catch (error) {
       console.error('Error occurred:', error);
       res.status(500).send('An error occurred while processing the request.');
+  }
+  res.json(['ok']);
+});
+
+app.post('/api/data/saveCustomFile',async (req,res)=>{
+  const { academicYear, Year, branch, filecontent } = req.body;
+  const content = filecontent;
+
+  const filePath = path.join(__dirname, 'public', 'customizeFiles', academicYear, Year, branch, 'file.docx');
+  const noticeDir = path.dirname(filePath);  // Directory where the file will be saved
+
+  try {
+    // Create the directory if it doesn't exist
+    await fs.mkdir(noticeDir, { recursive: true });
+    // pdf.create(filecontent).toFile(`${path.join(__dirname, 'public','output.pdf')}`, (err, res) => {
+    //   if (err) return console.log(err);
+    //   console.log(res); // { filename: '/path/to/output.pdf' }
+    // });
+
+    const options = {
+      pageSize: 'A4',
+    };
+
+    const docxBuffer = await htmlToDocx(filecontent, options);
+    await fs.writeFile(filePath, docxBuffer);
+
+    const desiredFileName = `${academicYear}-${Year}-${branch}.docx`;
+    res.setHeader('Content-Disposition', `attachment; filename="${desiredFileName}"`);
+    res.setHeader('Content-Type', 'application/docx');
+    res.sendFile(path.join(__dirname, 'public', 'customizeFiles', academicYear, Year, branch, 'file.docx'));
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).send('An error occurred while processing the request.');
   }
 });
 

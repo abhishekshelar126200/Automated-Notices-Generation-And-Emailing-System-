@@ -27,7 +27,7 @@ function DisplayFile(props)
     },[])
     return (
         <>
-            <form method="POST" action={`/saveContent/${academicYear}/${year}/${branch}/${fileName}`} className='w-full h-full flex flex-col items-center py-3 gap-2' onSubmit={handleSubmit}>
+            <form method="POST" action={`/api/data/saveContent/${academicYear}/${year}/${branch}/${fileName}`} className='w-full h-full flex flex-col items-center py-3 gap-2' onSubmit={handleSubmit}>
                 <div id="content" className='w-[90%] h-[90%] shadow-2xl p-5 outline-none border border-gray-400 rounded-lg overflow-auto' 
                     contentEditable={`${editable}`} 
                     dangerouslySetInnerHTML={{ __html: data['wordContent'] }}

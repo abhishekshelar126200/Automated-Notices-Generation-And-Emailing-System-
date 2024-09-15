@@ -1,9 +1,46 @@
-import React,{useRef} from 'react';
+import React,{useRef,useState} from 'react';
 import { Link } from 'react-router-dom';
 
 function Add(){
     const wordFile=useRef(null);
     const excelFile=useRef(null);
+    const [disablewordserver,setWordServer]=useState(false)
+    const [disablewordlocal,setWordLocal]=useState(false)
+    const [disableexcellocal,setExcelLocal]=useState(false)
+    const [disableexcelserver,setExcelServer]=useState(false)
+    const disableWordServer = (event) => {
+        if (event.target.files.length > 0) {
+          setWordServer(true);
+        } else {
+          setWordServer(false);
+        }
+    };
+    
+    // Handle server file input change
+    const disableWordLocal = (event) => {
+        if (event.target.files.length > 0) {
+            setWordLocal(true);
+        } else {
+            setWordLocal(false);
+        }
+    };
+
+    const disableExcelServer = (event) => {
+        if (event.target.files.length > 0) {
+          setExcelServer(true);
+        } else {
+          setExcelServer(false);
+        }
+    };
+    
+    // Handle server file input change
+    const disableExcelLocal = (event) => {
+        if (event.target.files.length > 0) {
+            setExcelLocal(true);
+        } else {
+            setExcelLocal(false);
+        }
+    };
     return(
         <>
             <div className='w-full h-full bg-gray-100'>
@@ -42,12 +79,18 @@ function Add(){
                         
                         <div className='flex w-full px-3 gap-12'>
                             <div className='flex flex-col w-[30%]'>
-                            <label htmlFor="wordFile" className='text-xs text-red-500'>* Select word file</label>
-                                <input type="file" name="wordFile" id="wordFile" accept=".doc, .docx" required/>
+                                <label htmlFor="wordFile" className='text-xs text-red-500'>* Select from Local files</label>
+                                <input type="file" name="wordFile" id="wordFile" accept=".doc,.docx" onChange={(disableWordServer)} disabled={disablewordlocal} required={!disablewordlocal}/>
+                                <div>or</div>
+                                <label htmlFor="wordFile" className='text-xs text-red-500'>* Select from Customize files</label>
+                                <input type="file" name="wordFile" id="wordFile" accept=".doc, .docx" onChange={(disableWordLocal)} disabled={disablewordserver} required={!disablewordserver}/>
                             </div>
                             <div className='flex flex-col w-[30%]'>
-                                <label htmlFor="excelFile" className='text-xs text-red-500'>* Select excel file</label>
-                                <input type="file" name="excelFile" id="excelFile" accept=".xls, .xlsx" required/>
+                                <label htmlFor="excelFile" className='text-xs text-red-500'>* Browse excel file</label>
+                                <input type="file" name="excelFile" id="excelFile" accept=".xls, .xlsx" onChange={(disableExcelServer)} disabled={disableexcellocal} required={!disableexcellocal}/>
+                                <div>or</div>
+                                <label htmlFor="excelFile" className='text-xs text-red-500'>* Select from server</label>
+                                <input type="file" name="excelFile" id="excelFile" accept=".xls, .xlsx" onChange={(disableExcelLocal)} disabled={disableexcelserver} required={!disableexcelserver}/>
                             </div>
                         </div>
                         <div className='w-full text-center'>
