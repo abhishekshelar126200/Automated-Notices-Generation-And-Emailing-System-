@@ -86,9 +86,9 @@ function ComposeMail(){
     return(
         <>
             <form action="/api/data/sendMail" method="POST" className='flex flex-col gap-5 p-2' onSubmit={sendMail}>
-                <div className='flex'>
-                    <div className="w-[100px]">To:</div>
-                    <div className='w-[89%] h-[30px] flex'>
+                <div className='flex justify-between'>
+                    <div>To:</div>
+                    <div className='w-[90%] h-[30px] flex'>
                         <select name="academicYear" id="academicYear" value={academicYear} onChange={handleAcademicYearChange} className='w-[33%] border border-gray-400 rounded-md'>
                             <option value="">Academic Year</option>
                             <option value="2021-22">2021-22</option>

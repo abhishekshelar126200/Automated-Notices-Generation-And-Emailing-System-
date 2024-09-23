@@ -27,9 +27,9 @@ function Sidebar()
                         Generated Notices Details
                     </Link>
                     <select  name="" id="" onChange={(handleChange)} className='text-gray-500  border-b w-full border-gray-400 pl-2 outline-none cursor-pointer'>
-                        <option value="">Customize Files</option>
-                        <option value="/customFile">Customize Word File</option>
-                        <option value="/customExcelFile">Customize Excel File</option>
+                        <option value="">Customize Word File</option>
+                        <option value="/customWordFileHtml">Using HTML</option>
+                        <option value="/customWordFileEditor">Using Editor</option>
                     </select>
 
                     <Link to="/composeMail" className='text-gray-500  border-b w-full border-gray-400 pl-3'>

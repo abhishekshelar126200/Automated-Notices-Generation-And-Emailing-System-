@@ -79,13 +79,13 @@ function First() {
   return (
         <>
 
-          <div className='w-full flex flex-col justify-center items-center min-h-[20%] gap-2'>
-              <div className='flex w-full justify-between h-[40px]'>
+          <div className='w-full flex flex-col justify-center items-center min-h-[10%]'>
+              {/* <div className='flex w-full justify-between h-[40px]'>
                 <div onClick={()=>{handleClick('2021-22')}} className={`w-1/4 text-center ${ academicYear==='2021-22' ? "border-b-2": "" } border-blue-500 rounded-lg cursor-pointer`}><div>2021-22</div></div>
                 <div onClick={()=>{handleClick('2022-23')}} className={`w-1/4 text-center ${ academicYear==='2022-23' ? "border-b-2": "" } border-blue-500 rounded-lg cursor-pointer`}><div>2022-23</div></div>
                 <div onClick={()=>{handleClick('2023-24')}} className={`w-1/4 text-center ${ academicYear==='2023-24' ? "border-b-2": "" } border-blue-500 rounded-lg cursor-pointer`}><div>2023-24</div></div>
                 <div onClick={()=>{handleClick('2024-25')}} className={`w-1/4 text-center ${ academicYear==='2024-25' ? "border-b-2": "" } border-blue-500 rounded-lg cursor-pointer`}><div>2024-25</div></div>
-              </div>
+              </div> */}
               <div className='w-full h-[40px] flex justify-evenly'>
                  <select name="academicYear" id="academicYear" value={academicYear} onChange={handleAcademicYearChange} className='w-[33%] border border-gray-400 rounded-md'>
                     <option value="">Academic Year</option>
@@ -111,17 +111,18 @@ function First() {
                   
               </div>
           </div> 
-          <div className='h-[80%] flex flex-col gap-5 overflow-scroll'>
+          <div className='h-[90%] flex flex-col gap-5 overflow-scroll'>
             {Object.keys(filesData).map((keyYear,yearIndex)=>(
               Object.keys(filesData[keyYear]).map((keyBranch,branchIndex)=>(
 
+
                     keyYear === "BE" ? (
-                      <div id="BE" className='h-full relative'>
+                      <div id="BE" className='h-full flex flex-col justify-center relative'>
                           <h1 className='h-[15%] p-1 border bg-gray-100'>BE-{keyBranch}</h1>
 
                           {filesData[keyYear] && filesData[keyYear][keyBranch] && filesData[keyYear][keyBranch].length > 0 ? (
                             
-                            <div className='class h-[85%] p-2 flex flex-wrap gap-5 justify-between border overflow-scroll'>
+                            <div className='class h-[85%] p-2 flex flex-wrap gap-10 justify-start border overflow-scroll'>
                               {filesData[keyYear][keyBranch].map((file, fileIndex) => (
                                 
                                   <div className='w-[20%] h-[60px] border text-xs rounded-md' key={fileIndex}>
@@ -130,7 +131,7 @@ function First() {
                                         {file}
                                     </Link>
                                     </div>
-                                    <div className='h-[30px] flex justify-around'>
+                                    <div className='h-[30px] flex justify-around items-center'>
                                         <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
                                             <img src={`${pen}`} className='w-4' alt="" />
                                         </Link>
@@ -168,12 +169,12 @@ function First() {
                                     </Link>
                                 </div>
                                 <div className='h-[30px] flex justify-around items-center'>
-                                    <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
-                                        <img src={`${pen}`} className='w-4' alt="" />
-                                    </Link>
-                                    <form action={`/api/data/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
-                                        <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
-                                    </form>
+                                        <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
+                                            <img src={`${pen}`} className='w-4' alt="" />
+                                        </Link>
+                                        
+                                        <button type='submit' onClick={()=>(handleDeleteFile(file,academicYear,keyYear,keyBranch))}><img src={`${remove}`} className='w-4' alt="" /></button>
+                                        
                                 </div>
                               </div>
                               ))}
@@ -204,13 +205,13 @@ function First() {
                                     </Link>
                                   </div>
                                   <div className='h-[30px] flex justify-around items-center'>
-                                    <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
-                                        <img src={`${pen}`} className='w-4' alt="" />
-                                    </Link>
-                                    <form action={`/api/data/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
-                                        <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
-                                    </form>
-                                </div>
+                                        <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
+                                            <img src={`${pen}`} className='w-4' alt="" />
+                                        </Link>
+                                        
+                                        <button type='submit' onClick={()=>(handleDeleteFile(file,academicYear,keyYear,keyBranch))}><img src={`${remove}`} className='w-4' alt="" /></button>
+                                        
+                                  </div>
                               </div>
                               ))}
                              
@@ -241,12 +242,12 @@ function First() {
                                     </Link>
                                 </div>
                                 <div className='h-[30px] flex justify-around items-center'>
-                                    <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
-                                        <img src={`${pen}`} className='w-4' alt="" />
-                                    </Link>
-                                    <form action={`/api/data/deleteFile/${academicYear}/${keyYear}/${keyBranch}/${file}`} method='GET'>
-                                        <button type='submit'><img src={`${remove}`} className='w-4' alt="" /></button>
-                                    </form>
+                                        <Link to={`/editFile/${academicYear}/${keyYear}/${keyBranch}/${file}`}>
+                                            <img src={`${pen}`} className='w-4' alt="" />
+                                        </Link>
+                                        
+                                        <button type='submit' onClick={()=>(handleDeleteFile(file,academicYear,keyYear,keyBranch))}><img src={`${remove}`} className='w-4' alt="" /></button>
+                                        
                                 </div>
                               </div>    
                               ))}
