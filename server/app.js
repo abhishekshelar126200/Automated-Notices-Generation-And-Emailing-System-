@@ -44,9 +44,7 @@ app.use(express.urlencoded({ extended:true }));
 //AWS s3 access key
 const s3Client=new S3Client({
     region:"eu-north-1",
-    credentials:{ 
-        // accessKeyId:"AKIA2NK3YGPZ4NOPOHY2",
-        // secretAccessKey:"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"
+    credentials:{
         accessKeyId:AWS_ACCESS_KEY,
         secretAccessKey:AWS_SECRET_KEY
     }
