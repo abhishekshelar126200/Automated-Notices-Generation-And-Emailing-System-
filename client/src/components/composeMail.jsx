@@ -114,7 +114,7 @@ function ComposeMail(){
                 </div>
                
 
-                <div className='flex'>
+                <div className='flex justify-between'>
                     <div className='w-[100px]'>
                         Subject:
                     </div>
@@ -122,7 +122,7 @@ function ComposeMail(){
                         className='w-[89%] h-[30px] outline-none border border-gray-300 rounded-md p-1 text-sm' required/>
                 </div>
 
-                <div className='flex'>
+                <div className='flex justify-between'>
                     <div className='w-[100px]'>
                         Body:
                     </div>
@@ -132,7 +132,7 @@ function ComposeMail(){
                     </textarea>
                 </div>
 
-                <div className='flex'>
+                <div className='flex justify-between'>
                     <div className='w-[100px]'>Recepients:</div>
                     <div className='border border-black w-[89%] h-[170px] overflow-scroll p-2'>
                         {
